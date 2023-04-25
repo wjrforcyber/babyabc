@@ -9,7 +9,7 @@
   Synopsis    [File management utilities.]
 
   Author      [Alan Mishchenko]
-  
+
   Affiliation [UC Berkeley]
 
   Date        [Ver. 1.0. Started - June 20, 2005.]
@@ -19,6 +19,8 @@
 ***********************************************************************/
 
 #include "extra.h"
+#include "dirent.h"
+#include <math.h>
 
 ABC_NAMESPACE_IMPL_START
 
@@ -59,57 +61,189 @@ ABC_NAMESPACE_IMPL_START
 
 /**Function*************************************************************
 
-  Synopsis    [Tries to find a file name with a different extension.]
+  Synopsis    [Compute the cosine similarity between the two file name.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
 
 ***********************************************************************/
+double cossimilarity(char * pFileNameWrong, char * pSimiarFilename)
+{
+    int Len_table;
+    int index = 0;
+    Len_table = strlen(pFileNameWrong) > strlen(pSimiarFilename) ? strlen(pFileNameWrong) : strlen(pSimiarFilename);
+    int simi_table0[128];
+    int simi_table1[128];
+    char *p0,*p1;
+    int simi_index = 0;
+
+
+    p0 = pFileNameWrong;
+    p1 = pSimiarFilename;
+    while(index < 128)
+    {
+        simi_table0[index] = 0;
+        simi_table1[index] = 0;
+        index ++;
+    }
+
+    index = 0;
+    while(index < Len_table)
+    {
+
+        while(*pFileNameWrong != '\0')
+        {
+            simi_table0[*pFileNameWrong-'\0'] = 1;
+            pFileNameWrong++;
+        }
+        while(*pSimiarFilename != '\0')
+        {
+            simi_table1[*pSimiarFilename-'\0'] = 1;
+            pSimiarFilename++;
+        }
+        index++;
+    }
+    int dot_product = 0;
+    int inner_prod0 = 0, inner_prod1 = 0;
+
+    for(simi_index = 0; simi_index < 128; simi_index++)
+    {
+        dot_product += simi_table0[simi_index]*simi_table1[simi_index];
+    }
+    for(simi_index = 0; simi_index < 128; simi_index++)
+    {
+        inner_prod0 += simi_table0[simi_index]*simi_table0[simi_index];
+    }
+    for(simi_index = 0; simi_index < 128; simi_index++)
+    {
+        inner_prod1 += simi_table1[simi_index]*simi_table1[simi_index];
+    }
+
+    double simi;
+    simi = dot_product/sqrt(inner_prod0*inner_prod1);
+    return simi;
+}
+
+
+/**Function*************************************************************
+
+  Synopsis    [Search for the current dir to find a file with similar name.]
+
+  Description []
+
+  SideEffects []
+
+  SeeAlso     []
+
+***********************************************************************/
+
+
+char * Extra_FileLookUp(char * pFileNameWrong, char * pS1, char * pS2, char * pS3, char * pS4, char * pS5)
+{
+    char * pMostSimiarReturn;
+    double highest_simi = 0.0;
+    char * pFileMostSimilar = NULL;
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir (".")) != NULL) {
+    /* print all the files and directories within directory */
+    while ((ent = readdir (dir)) != NULL) {
+        if (cossimilarity(pFileNameWrong,ent->d_name) >= highest_simi)
+        {
+            if (Extra_FileNameExtensionIfExist(ent->d_name) != NULL)
+            {
+                if ( !strcmp( Extra_FileNameExtensionIfExist(ent->d_name), pS1 ) || !strcmp( Extra_FileNameExtensionIfExist(ent->d_name), pS2 ) || !strcmp( Extra_FileNameExtensionIfExist(ent->d_name), pS3 ) || !strcmp( Extra_FileNameExtensionIfExist(ent->d_name), pS4 ) || !strcmp( Extra_FileNameExtensionIfExist(ent->d_name), pS5 ))
+                {
+
+                    highest_simi = cossimilarity(pFileNameWrong,ent->d_name);
+                    pFileMostSimilar = ent->d_name;
+                    break;
+                }
+
+            }
+        }
+        else
+        {
+            continue;
+        }
+    }
+    closedir (dir);
+    if(pFileMostSimilar == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        pMostSimiarReturn = Extra_UtilStrsav(pFileMostSimilar);
+    }
+
+    }
+    else
+    {
+    perror ("Couldn't open the directory to look up files.\n");
+    return NULL;
+    }
+    return pMostSimiarReturn;
+}
+
+
+
+/**Function*************************************************************
+
+  Synopsis    [Tries to find a file name similar with the original one.]
+
+  Description []
+
+  SideEffects []
+
+  SeeAlso     []
+
+***********************************************************************/
+
 char * Extra_FileGetSimilarName( char * pFileNameWrong, char * pS1, char * pS2, char * pS3, char * pS4, char * pS5 )
 {
     FILE * pFile;
-    char * pFileNameOther;
-    char * pFileGen;
+    char * pFileSimi;
 
     if ( pS1 == NULL )
         return NULL;
 
-    // get the generic file name
-    pFileGen = Extra_FileNameGeneric( pFileNameWrong );
-    pFileNameOther = Extra_FileNameAppend( pFileGen, pS1 );
-    pFile = fopen( pFileNameOther, "r" );
-    if ( pFile == NULL && pS2 )
-    { // try one more
-        pFileNameOther = Extra_FileNameAppend( pFileGen, pS2 );
-        pFile = fopen( pFileNameOther, "r" );
-        if ( pFile == NULL && pS3 )
-        { // try one more
-            pFileNameOther = Extra_FileNameAppend( pFileGen, pS3 );
-            pFile = fopen( pFileNameOther, "r" );
-            if ( pFile == NULL && pS4 )
-            { // try one more
-                pFileNameOther = Extra_FileNameAppend( pFileGen, pS4 );
-                pFile = fopen( pFileNameOther, "r" );
-                if ( pFile == NULL && pS5 )
-                { // try one more
-                    pFileNameOther = Extra_FileNameAppend( pFileGen, pS5 );
-                    pFile = fopen( pFileNameOther, "r" );
-                }
-            }
-        }
-    }
-    ABC_FREE( pFileGen );
+    pFileSimi = Extra_FileLookUp(pFileNameWrong, pS1, pS2, pS3, pS4, pS5);
+    pFile = fopen( pFileSimi, "r" );
     if ( pFile )
     {
         fclose( pFile );
-        return pFileNameOther;
+        return pFileSimi;
     }
     // did not find :(
-    return NULL;            
+    return NULL;
 }
+
+
+/**Function*************************************************************
+
+  Synopsis    [Returns the file extension.]
+
+  Description []
+
+  SideEffects []
+
+  SeeAlso     []
+
+***********************************************************************/
+char * Extra_FileNameExtensionIfExist( char * FileName )
+{
+    char * pDot;
+    // find the last "dot" in the file name, if it is present
+    for ( pDot = FileName + strlen(FileName)-1; pDot >= FileName; pDot-- )
+        if ( *pDot == '.' )
+            return pDot;
+    return NULL;
+}
+
 
 /**Function*************************************************************
 
@@ -327,8 +461,8 @@ int Extra_FileSize( char * pFileName )
         printf( "Extra_FileSize(): The file is unavailable (absent or open).\n" );
         return 0;
     }
-    fseek( pFile, 0, SEEK_END );  
-    nFileSize = ftell( pFile ); 
+    fseek( pFile, 0, SEEK_END );
+    nFileSize = ftell( pFile );
     fclose( pFile );
     return nFileSize;
 }
@@ -339,7 +473,7 @@ int Extra_FileSize( char * pFileName )
   Synopsis    [Read the file into the internal buffer.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -351,10 +485,10 @@ char * Extra_FileRead( FILE * pFile )
     char * pBuffer;
     int RetValue;
     // get the file size, in bytes
-    fseek( pFile, 0, SEEK_END );  
-    nFileSize = ftell( pFile );  
+    fseek( pFile, 0, SEEK_END );
+    nFileSize = ftell( pFile );
     // move the file current reading position to the beginning
-    rewind( pFile ); 
+    rewind( pFile );
     // load the contents of the file into memory
     pBuffer = ABC_ALLOC( char, nFileSize + 3 );
     RetValue = fread( pBuffer, nFileSize, 1, pFile );
@@ -369,13 +503,13 @@ char * Extra_FileRead2( FILE * pFile, FILE * pFile2 )
     int nSize, nSize2;
     int RetValue;
     // get the file size, in bytes
-    fseek( pFile, 0, SEEK_END );  
-    nSize = ftell( pFile );  
-    rewind( pFile ); 
+    fseek( pFile, 0, SEEK_END );
+    nSize = ftell( pFile );
+    rewind( pFile );
     // get the file size, in bytes
-    fseek( pFile2, 0, SEEK_END );  
-    nSize2 = ftell( pFile2 );  
-    rewind( pFile2 ); 
+    fseek( pFile2, 0, SEEK_END );
+    nSize2 = ftell( pFile2 );
+    rewind( pFile2 );
     // load the contents of the file into memory
     pBuffer = ABC_ALLOC( char, nSize + nSize2 + 3 );
     RetValue = fread( pBuffer,         nSize,  1, pFile );
@@ -391,7 +525,7 @@ char * Extra_FileRead2( FILE * pFile, FILE * pFile2 )
   Synopsis    [Read the file into the internal buffer.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -423,7 +557,7 @@ char * Extra_FileReadContents2( char * pFileName, char * pFileName2 )
   Synopsis    [Returns one if the file has a given extension.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -526,7 +660,7 @@ void Extra_PrintBinary2( FILE * pFile, unsigned Sign[], int nBits )
   Synopsis    [Reads the hex unsigned into the bit-string.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -568,7 +702,7 @@ int Extra_ReadHexadecimal( unsigned Sign[], char * pString, int nVars )
   Synopsis    [Prints the hex unsigned into a file.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -595,7 +729,7 @@ void Extra_PrintHexadecimal( FILE * pFile, unsigned Sign[], int nVars )
   Synopsis    [Prints the hex unsigned into a file.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -627,7 +761,7 @@ void Extra_PrintHexadecimalString( char * pString, unsigned Sign[], int nVars )
   Synopsis    [Prints the hex unsigned into a file.]
 
   Description []
-               
+
   SideEffects []
 
   SeeAlso     []
@@ -914,4 +1048,3 @@ int main( int argc, char ** argv )
 
 
 ABC_NAMESPACE_IMPL_END
-

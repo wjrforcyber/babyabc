@@ -2,19 +2,59 @@
 [![.github/workflows/build-windows.yml](https://github.com/berkeley-abc/abc/actions/workflows/build-windows.yml/badge.svg)](https://github.com/berkeley-abc/abc/actions/workflows/build-windows.yml)
 [![.github/workflows/build-posix-cmake.yml](https://github.com/berkeley-abc/abc/actions/workflows/build-posix-cmake.yml/badge.svg)](https://github.com/berkeley-abc/abc/actions/workflows/build-posix-cmake.yml)
 
-# ABC: System for Sequential Logic Synthesis and Formal Verification
+# babyABC: ABC kindergarten
 
-ABC is always changing but the current snapshot is believed to be stable. 
+This ABC repo is based on Berkeley's ABC tool.
+
+## New Feature
+- Use Cosine similarity to lookup similar file name. #1
+
+## Commit templete
+<details>
+<summary>commit templete</summary>
+
+```
+# Title: Summary, imperative, start upper case, don't end with a period
+# No more than 50 chars. #### 50 chars is here:  #
+
+# Remember blank line between title and body.
+
+# Body: Explain *what* and *why* (not *how*). Include task ID (Jira issue).
+# Wrap at 72 chars. ################################## which is here:  #
+
+
+# At the end: Include Co-authored-by for all contributors.
+# Include at least one empty line before it. Format:
+# Co-authored-by: name <user@users.noreply.github.com>
+#
+# How to Write a Git Commit Message:
+# https://chris.beams.io/posts/git-commit/
+#
+# 1. Separate subject from body with a blank line
+# 2. Limit the subject line to 50 characters
+# 3. Capitalize the subject line
+# 4. Do not end the subject line with a period
+# 5. Use the imperative mood in the subject line
+# 6. Wrap the body at 72 characters
+# 7. Use the body to explain what and why vs. how
+```
+
+credit @lisawolderiksen
+
+</details>
+
+<details>
+<summary>click to expand ORIGINAL README</summary>
 
 ## Compiling:
 
 To compile ABC as a binary, download and unzip the code, then type `make`.
 To compile ABC as a static library, type `make libabc.a`.
 
-When ABC is used as a static library, two additional procedures, `Abc_Start()` 
-and `Abc_Stop()`, are provided for starting and quitting the ABC framework in 
-the calling application. A simple demo program (file src/demo.c) shows how to 
-create a stand-alone program performing DAG-aware AIG rewriting, by calling 
+When ABC is used as a static library, two additional procedures, `Abc_Start()`
+and `Abc_Stop()`, are provided for starting and quitting the ABC framework in
+the calling application. A simple demo program (file src/demo.c) shows how to
+create a stand-alone program performing DAG-aware AIG rewriting, by calling
 APIs of ABC compiled as a static library.
 
 To build the demo program
@@ -60,16 +100,16 @@ The current version of ABC can be compiled with C compiler or C++ compiler.
 ## Building a shared library
 
  * Compile the code as position-independent by adding `ABC_USE_PIC=1`.
- * Build the `libabc.so` target: 
- 
+ * Build the `libabc.so` target:
+
      make ABC_USE_PIC=1 libabc.so
 
 ## Bug reporting:
 
-Please try to reproduce all the reported bugs and unexpected features using the latest 
+Please try to reproduce all the reported bugs and unexpected features using the latest
 version of ABC available from https://github.com/berkeley-abc/abc
 
-If the bug still persists, please provide the following information:    
+If the bug still persists, please provide the following information:
 
  1. ABC version (when it was downloaded from GitHub)
  1. Linux distribution and version (32-bit or 64-bit)
@@ -80,7 +120,7 @@ If the bug still persists, please provide the following information:
 
 ## Troubleshooting:
 
- 1. If compilation does not start because of the cyclic dependency check, 
+ 1. If compilation does not start because of the cyclic dependency check,
 try touching all files as follows: `find ./ -type f -exec touch "{}" \;`
  1. If compilation fails because readline is missing, install 'readline' library or
 compile with `make ABC_USE_NO_READLINE=1`
@@ -95,11 +135,11 @@ compile with `make ABC_USE_NO_PTHREADS=1`
 
 The following comment was added by Krish Sundaresan:
 
-"I found that the code does compile correctly on Solaris if gcc is used (instead of 
-g++ that I was using for some reason). Also readline which is not available by default 
-on most Sol10 systems, needs to be installed. I downloaded the readline-5.2 package 
-from sunfreeware.com and installed it locally. Also modified CFLAGS to add the local 
-include files for readline and LIBS to add the local libreadline.a. Perhaps you can 
+"I found that the code does compile correctly on Solaris if gcc is used (instead of
+g++ that I was using for some reason). Also readline which is not available by default
+on most Sol10 systems, needs to be installed. I downloaded the readline-5.2 package
+from sunfreeware.com and installed it locally. Also modified CFLAGS to add the local
+include files for readline and LIBS to add the local libreadline.a. Perhaps you can
 add these steps in the readme to help folks compiling this on Solaris."
 
 The following tutorial is kindly offered by Ana Petkovska from EPFL:
@@ -107,7 +147,10 @@ https://www.dropbox.com/s/qrl9svlf0ylxy8p/ABC_GettingStarted.pdf
 
 ## Final remarks:
 
-Unfortunately, there is no comprehensive regression test. Good luck!                                
+Unfortunately, there is no comprehensive regression test. Good luck!
 
-This system is maintained by Alan Mishchenko <alanmi@berkeley.edu>. Consider also 
+This system is maintained by Alan Mishchenko <alanmi@berkeley.edu>. Consider also
 using ZZ framework developed by Niklas Een: https://bitbucket.org/niklaseen/abc-zz (or https://github.com/berkeley-abc/abc-zz)
+
+
+</details>

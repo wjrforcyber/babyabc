@@ -8,16 +8,16 @@
 
   Synopsis    [Various reusable software utilities.]
 
-  Description [This library contains a number of operators and 
-  traversal routines developed to extend the functionality of 
+  Description [This library contains a number of operators and
+  traversal routines developed to extend the functionality of
   CUDD v.2.3.x, by Fabio Somenzi (http://vlsi.colorado.edu/~fabio/)
-  To compile your code with the library, #include "extra.h" 
-  in your source files and link your project to CUDD and this 
-  library. Use the library at your own risk and with caution. 
+  To compile your code with the library, #include "extra.h"
+  in your source files and link your project to CUDD and this
+  library. Use the library at your own risk and with caution.
   Note that debugging of some operators still continues.]
 
   Author      [Alan Mishchenko]
-  
+
   Affiliation [UC Berkeley]
 
   Date        [Ver. 1.0. Started - June 20, 2005.]
@@ -99,6 +99,7 @@ extern int          Extra_BitMatrixIsClique( Extra_BitMat_t * p );
 /*=== extraUtilFile.c ========================================================*/
 
 extern char *       Extra_FileGetSimilarName( char * pFileNameWrong, char * pS1, char * pS2, char * pS3, char * pS4, char * pS5 );
+extern char *       Extra_FileNameExtensionIfExist( char * FileName );
 extern char *       Extra_FileNameExtension( char * FileName );
 extern char *       Extra_FileNameAppend( char * pBase, char * pSuffix );
 extern char *       Extra_FileNameGeneric( char * FileName );
@@ -133,7 +134,7 @@ extern void         Extra_PrintSymbols( FILE * pFile, char Char, int nTimes, int
 /*=== extraUtilReader.c ========================================================*/
 
 typedef struct Extra_FileReader_t_ Extra_FileReader_t;
-extern Extra_FileReader_t * Extra_FileReaderAlloc( char * pFileName, 
+extern Extra_FileReader_t * Extra_FileReaderAlloc( char * pFileName,
     char * pCharsComment, char * pCharsStop, char * pCharsClean );
 extern void         Extra_FileReaderFree( Extra_FileReader_t * p );
 extern char *       Extra_FileReaderGetFileName( Extra_FileReader_t * p );
@@ -144,9 +145,9 @@ extern int          Extra_FileReaderGetLineNumber( Extra_FileReader_t * p, int i
 
 /*=== extraUtilMemory.c ========================================================*/
 
-typedef struct Extra_MmFixed_t_    Extra_MmFixed_t;    
-typedef struct Extra_MmFlex_t_     Extra_MmFlex_t;     
-typedef struct Extra_MmStep_t_     Extra_MmStep_t;     
+typedef struct Extra_MmFixed_t_    Extra_MmFixed_t;
+typedef struct Extra_MmFlex_t_     Extra_MmFlex_t;
+typedef struct Extra_MmStep_t_     Extra_MmStep_t;
 
 // fixed-size-block memory manager
 extern Extra_MmFixed_t *  Extra_MmFixedStart( int nEntrySize );
@@ -222,7 +223,7 @@ extern int         Extra_TruthCanonFastN( int nVarsMax, int nVarsReal, unsigned 
 
 /*=== extraUtilDsd.c ========================================================*/
 
-typedef struct Sdm_Man_t_ Sdm_Man_t; 
+typedef struct Sdm_Man_t_ Sdm_Man_t;
 extern int         Sdm_ManCanRead();
 extern Sdm_Man_t * Sdm_ManRead();
 extern void        Sdm_ManQuit();
@@ -243,7 +244,7 @@ extern ProgressBar * Extra_ProgressBarStart( FILE * pFile, int nItemsTotal );
 extern void        Extra_ProgressBarStop( ProgressBar * p );
 extern void        Extra_ProgressBarUpdate_int( ProgressBar * p, int nItemsCur, char * pString );
 
-static inline void Extra_ProgressBarUpdate( ProgressBar * p, int nItemsCur, char * pString ) 
+static inline void Extra_ProgressBarUpdate( ProgressBar * p, int nItemsCur, char * pString )
 {  if ( p && nItemsCur < *((int*)p) ) return; Extra_ProgressBarUpdate_int(p, nItemsCur, pString); }
 
 /*=== extraUtilTruth.c ================================================================*/

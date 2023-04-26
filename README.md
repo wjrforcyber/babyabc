@@ -4,10 +4,54 @@
 
 # babyABC: ABC kindergarten
 
-This ABC repo is based on Berkeley's ABC tool.
+This ABC repo is based on Berkeley's Synthesis and Verification tool [ABC](https://github.com/berkeley-abc/abc).
 
 ## New Feature
-- Use Cosine similarity to lookup similar file name. #1
+1. Use Cosine similarity to lookup similar file name. #1
+    <details>
+    <summary>Expand example</summary>
+    </br>Old:
+
+    ```
+    UC Berkeley, ABC 1.01 (compiled Apr  3 2023 12:26:13)
+    abc 01> read_aiger i
+    Cannot open input file "i".
+    abc 01> read_aiger i1
+    Cannot open input file "i1".
+    abc 01> read_aiger i10
+    Cannot open input file "i10". Did you mean "i10.aig"?
+    abc 01> read_aiger i1.a
+    Cannot open input file "i1.a".
+    abc 01> read_aiger i1.ai
+    Cannot open input file "i1.ai".
+    abc 01> read_aiger i1.aig
+    Cannot open input file "i1.aig".
+    abc 01> read_aiger 1.aig
+    Cannot open input file "1.aig".
+    abc 01> read_aiger i1.g
+    Cannot open input file "i1.g".
+    ```
+    New:
+    ```
+    abc 01> read_aiger i
+    Cannot open input file "i". Did you mean "i10.aig"?
+    abc 01> read_aiger i1
+    Cannot open input file "i1". Did you mean "i10.aig"?
+    abc 01> read_aiger i10
+    Cannot open input file "i10". Did you mean "i10.aig"?
+    abc 01> read_aiger i1.a
+    Cannot open input file "i1.a". Did you mean "i10.aig"?
+    abc 01> read_aiger i1.ai
+    Cannot open input file "i1.ai". Did you mean "i10.aig"?
+    abc 01> read_aiger i1.aig
+    Cannot open input file "i1.aig". Did you mean "i10.aig"?
+    abc 01> read_aiger 1.aig
+    Cannot open input file "1.aig". Did you mean "i10.aig"?
+    abc 01> read_aiger i1.aig
+    Cannot open input file "i1.aig". Did you mean "i10.aig"?
+    ```
+    </details>
+
 
 ## Commit templete
 <details>

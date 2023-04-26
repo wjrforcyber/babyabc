@@ -183,7 +183,7 @@ char * Extra_FileLookUp(char * pFileNameWrong, char * pS1, char * pS2, char * pS
     }
     else
     {
-    perror ("Couldn't open the directory to look up files.\n");
+    Abc_Print (-1, "Couldn't open the directory to look up files.\n");
     return NULL;
     }
     return pMostSimiarReturn;

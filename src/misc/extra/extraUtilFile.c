@@ -19,7 +19,9 @@
 ***********************************************************************/
 
 #include "extra.h"
+#ifndef _WIN32
 #include "dirent.h"
+#endif
 #include <math.h>
 
 ABC_NAMESPACE_IMPL_START
@@ -206,6 +208,48 @@ char * Extra_FileLookUp(char * pFileNameWrong, char * pS1, char * pS2, char * pS
 char * Extra_FileGetSimilarName( char * pFileNameWrong, char * pS1, char * pS2, char * pS3, char * pS4, char * pS5 )
 {
     FILE * pFile;
+#ifdef _WIN32
+
+
+    char * pFileNameOther;
+    char * pFileGen;
+
+    if ( pS1 == NULL )
+        return NULL;
+
+    // get the generic file name
+    pFileGen = Extra_FileNameGeneric( pFileNameWrong );
+    pFileNameOther = Extra_FileNameAppend( pFileGen, pS1 );
+    pFile = fopen( pFileNameOther, "r" );
+    if ( pFile == NULL && pS2 )
+    { // try one more
+        pFileNameOther = Extra_FileNameAppend( pFileGen, pS2 );
+        pFile = fopen( pFileNameOther, "r" );
+        if ( pFile == NULL && pS3 )
+        { // try one more
+            pFileNameOther = Extra_FileNameAppend( pFileGen, pS3 );
+            pFile = fopen( pFileNameOther, "r" );
+            if ( pFile == NULL && pS4 )
+            { // try one more
+                pFileNameOther = Extra_FileNameAppend( pFileGen, pS4 );
+                pFile = fopen( pFileNameOther, "r" );
+                if ( pFile == NULL && pS5 )
+                { // try one more
+                    pFileNameOther = Extra_FileNameAppend( pFileGen, pS5 );
+                    pFile = fopen( pFileNameOther, "r" );
+                }
+            }
+        }
+    }
+    ABC_FREE( pFileGen );
+    if ( pFile )
+    {
+        fclose( pFile );
+        return pFileNameOther;
+    }
+
+#else
+
     char * pFileSimi;
 
     if ( pS1 == NULL )
@@ -218,6 +262,7 @@ char * Extra_FileGetSimilarName( char * pFileNameWrong, char * pS1, char * pS2, 
         fclose( pFile );
         return pFileSimi;
     }
+#endif
     // did not find :(
     return NULL;
 }
